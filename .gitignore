@@ -1,0 +1,5 @@
+/.gradle
+/build
+/.vscode
+/bin
+data/fashion_mnist_train_vectors.csv
