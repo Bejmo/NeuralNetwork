@@ -1,164 +1,73 @@
-# PV021 project -- Deep Learning from Scratch in Java
+# PV021 Project -- Deep Learning from Scratch in Java
 
 ## Members
-- Joan Bejarano Montero (579419)
-- Evan Aubriet (579398)
+- **Joan Bejarano Montero**
+- **Evan Aubriet**
 
-## USAGE
-1. Transfer this entire repository to the AURA server either by hand or using the guide in ```upload_data_aura.sh```
-2. Run the code with ```run.sh```. It will execute the project with a random seed. You can change the seed by activating the input (on ```Main.java```, put ```input = false```). Then you will need to:
-   - Firstly, select if you want to run the **XOR Network Example (1)** or the **ProjectNetwork (2)**
-   - If you select the **ProjectNetwork**, it will ask you to introduce a seed (if you leave it blank, it will take a random seed).
-3. Evaluate the result with ```evaluate.sh```
+## Project Overview
+This repository contains a **purely "from scratch" implementation** of a Deep Neural Network in Java, developed for the PV021 course. The goal is to solve the **Fashion-MNIST** classification problem without using any third-party machine learning libraries (like PyTorch, TensorFlow, or Deeplearning4j) or high-level matrix libraries.
 
-## Important information
-1. The file ```./data/fashion_mnist_train_vectors.csv``` is missing from this repository. You must place it manually in the ```./data/``` directory.
+Every component of the deep learning pipeline has been manually implemented to ensure maximum performance and understanding:
+- **Matrix Mathematics:** Custom implementation of matrix multiplication, transposition, and vector operations.
+- **Forward Propagation:** Layer-by-layer activation handling.
+- **Backpropagation:** Manual calculation of gradients (deltas) for weights and biases using the chain rule.
+- **Optimization:** Mini-batch Gradient Descent with Momentum.
 
-## STATEMENT README
+## Technical Architecture
+Based on the implementation in `ProjectNetwork.java` and `Layer.java`, the model uses the following specifications:
 
-### DEADLINE
-Sunday 7. 12. 2025 23:59 (December 7th)
+### Network Topology (Fashion MNIST)
+The network is a **Feed-Forward Neural Network (Multi-Layer Perceptron)** with the following structure:
+1.  **Input Layer:** 784 neurons (corresponding to 28x28 pixel images).
+2.  **Hidden Layer 1:** 128 neurons, **ReLU** activation.
+3.  **Hidden Layer 2:** 64 neurons, **ReLU** activation.
+4.  **Output Layer:** 10 neurons, **Softmax** activation (representing the 10 fashion classes).
 
-### TASK
-  - Implement a neural network in a low-level programming language
-    (C/C++/Java/C#/Rust) without the use of advanced libraries or frameworks.
-  - Train it on the supplied Fashion-MNIST dataset using a backpropagation
-    algorithm.
+### Hyperparameters & Optimization
+- **Initialization:** Xavier Initialization (to maintain variance across layers).
+- **Optimizer:** Mini-batch Stochastic Gradient Descent (SGD).
+    - **Batch Size:** 64.
+    - **Momentum:** 0.9 (implemented via velocity vectors in `Layer.java`).
+- **Learning Rate Strategy:**
+    - Initial Learning Rate: `0.015`.
+    - **Step Decay:** The learning rate is halved at epochs 10, 13, 16, and 19 to fine-tune convergence.
+- **Epochs:** 20.
 
-### REQUIREMENTS
-  - Your solution must follow the project template and must be runnable on 
-    the Aura server (see details below).
-  - Your solution must achieve at least 88% accuracy on the test set.
-  - Your solution must finish within 10 minutes (parse inputs, train, 
-    evaluate, export results)
-  - Your solution must contain a runnable script called `run.sh` (not `run`,
-    not `RUN.sh`, not `run.exe`, etc.), which compiles and executes your code 
-    (and exports the results).
-  - Your solution must output two files to the root project directory:
-    (next to `example_test_predictions.csv` file):
-     - `train_predictions.csv` - your network predictions for the train set.
-     - `test_predictions.csv`  - your network predictions for the test set.
-  - The format of these files has to be the same as the supplied 
-    training/testing labels: 
-     - One prediction per line.
-     - Prediction for i-th input vector (ordered by the input .csv file) 
-       must be on the i-th line in the associated output file.
-     - Each prediction is a single integer 0 - 9.
-     - Do not add anything else to these files!
-  - Replace the first line of THIS file with UČOs and names
-  - Submit your solution in a .zip format to a vault in IS before the deadline.
+## Project Structure
+```text
+.
+├── data/                        # Dataset directory (See Setup)
+├── src/
+│   ├── datatreatments/          # Data loading and parsing (FashionMNISTDataLoader)
+│   ├── neuralstypes/            # Core Neural Network components (Layer, Network)
+│   │   └── networks/            # Specific architectures (ProjectNetwork, XORNetwork)
+│   ├── utility/                 # Math helpers (MatrixMath) and Activation functions
+│   └── Main.java                # Entry point and menu logic
+├── run.sh                       # Compilation and execution script
+├── evaluate.sh                  # Script to evaluate accuracy
+└── README.md
+```
 
-### SCORING
-  - The project has binary scoring -- either you pass it or fail it. You must 
-    pass it to get your mark on the oral exam and pass the course.
-  - All submitted source files will be checked manually.
-  - All submitted solutions will also be checked by an automatic evaluator.
-    A simple evaluator is provided in the project template as well.
-  - If your submission does not pass, you will be given two more opportunities to correct it. Nonetheless, this applies only to those who submit their solution by the deadline.
-- All submitted solutions will be checked for plagiarism. Submitting someone
-    else's solution (including publicly available solutions) as your own will
-    result in failure and will lead to disciplinary action.
-  - Any implementation that uses testing input vectors for anything other than
-    final evaluation will result in failure.
-  - Use of high-level libraries allowing matrix operations, neural network
-    operations, differentiation operations, linear algebra operations etc., is
-    forbidden and will result in failure. (Low-level math operations: sqrt,
-    exp, log, rand... and libraries like `<algorithm>` or `<iostream>` are
-    fine)
+## Usage
+### 1. Execution
+To compile and run the project, simply use the provided shell script:
+```./run.sh```
 
-### DATASET
-Fashion MNIST (https://arxiv.org/pdf/1708.07747.pdf) - a modern version of a
-well-known MNIST (http://yann.lecun.com/exdb/mnist/). It is a dataset of
-Zalando's article images ‒ consisting of a training set of 60,000 examples
-and a test set of 10,000 examples. Each example is a 28x28 grayscale image,
-associated with a label from 10 classes. The dataset is in CSV format. There
-are four data files included:  
- - `fashion_mnist_train_vectors.csv`   - training input vectors
- - `fashion_mnist_test_vectors.csv`    - testing input vectors
- - `fashion_mnist_train_labels.csv`    - training labels
- - `fashion_mnist_test_labels.csv`     - testing labels
+**Interactive vs. Automatic Mode**: The behavior of the application depends on the ```boolean input``` flag in ```Main.java```:
+- Automatic Mode (Default): If ```input = false```, the system will automatically run the ProjectNetwork (Fashion MNIST) using a random seed. This is the default configuration for submission.
+- Interactive Mode: If you modify the code to ```input = true```, the program will launch a console menu allowing you to:
+  1. Run XOR Network: A benchmark 2-2-1 network to test backpropagation logic.
+  2. Run Fashion MNIST: The main project network. You will be prompted to enter a specific seed manually.
 
-### REMARKS
-  - You can work alone, or you can make teams of two.
-  - You may or may not include the datasets in your .zip file; we will
-    replace them. Either way, **keep the `data` folder in your solution**
-    and load all the datasets from it. 
-  - What you do internally with the training dataset is up to you.
-  - Write reasonable docstrings.
-  - If you use fixed seeds, the only allowed values are 0, 1, 2, 3 or 42.
-  - Should you have any questions, ask them in the Discussion forum. 
+### 2. Output
+Upon successful execution, the program will generate two files in the root directory:
+- ```train_predictions.csv```: Predictions for the training set.
+- ```test_predictions.csv```: Predictions for the test set.
 
-### AURA
-  - Aura is a dedicated server for demanding computations. Please read
-    carefully the information here:
-    https://www.fi.muni.cz/tech/unix/aura.html.en)
-  - All students enrolled in this course have been granted access to Aura.
-    Please check it soon and let me know if you have any problems.
-  - Aura runs on the Red Hat Enterprise Linux operating system
-  - Aura has 128 physical cores
-  - Be considerate to others and run your network on Aura with decreased
-    priority using, for example, the `nice` program. (especially if you are
-    using multiple cores)
-    (more info here: https://www.fi.muni.cz/tech/unix/computation.html.en)
-  - If you are having a problem with missing compilers/maven on Aura, you can
-    add such tools by adding modules 
-    (https://www.fi.muni.cz/tech/unix/modules.html.en). Please note that
-    if your implementation requires such modules, your `run.sh` script must
-    also include them. Otherwise, the `run.sh` script won't work. Make sure
-    your solution does not require modules that you are adding to your
-    `.bashrc` file and those are not present in the `run.sh` file.
-  - (mainly) Windows users:
-    - `.exe` files are not runnable on Aura.
-    - Test your submission using the same zip file you are submitting to IS,
-      not just the cloned repository. GitHub automatically removes carriage
-      return characters (Windows new line) on Linux machines, but your zip
-      submission might still contain them, which means the RUN file fails. We
-      are trying to mitigate this by deleting them, but there are no guarantees
-      that it will work.
-    - You don't have to worry about the execution permissions required for the 
-      `run.sh` script, we add them automatically
+### 3. Evaluation
+To check the accuracy of the generated predictions against the ground truth:
 
-### TIPS
-  - Do not wait until the week (or even the month) before the deadline!
-  - Test your `run.sh` script from your .zip file on Aura before your
-    submission. Projects with missing or non-functional `run.sh` scripts cannot
-    be evaluated.
-  - Do NOT shuffle testing data. It won't fit the expected predictions.
-  - Try to solve the XOR problem first. It is a benchmark for your training
-    algorithm because it is non-linear and requires at least one hidden layer.
-    The presented network solving XOR in the lecture is minimal and can be
-    hard to find, so use more neurons in the hidden layer. If you can't solve
-    the XOR problem, you can't solve Fashion-MNIST.
-  - Reuse memory. You are implementing an iterative process, so don't always 
-    allocate new vectors and matrices. An immutable approach is nice, but
-    very inappropriate. Don't make unnecessary copies.
-  - Objects are fine, but be careful about the depth of the object hierarchy you
-    will create. Always remember that you are trying to be fast.
-  - Double precision is fine. You may try to use floats. Do not use BigDecimal
-    or any other high-precision objects.
-  - Don't forget to use compiler optimizations (e.g., -O3 or -Ofast)
-  - Simple SGD is most likely not fast enough. You will also need to
-    implement some more advanced features (or maybe not, but it's highly
-    recommended). You can add things like momentum, weight decay, and dropout,
-    or try to use advanced optimizers like RMSProp, AdaGrad, or Adam.
-  - Start with smaller networks and increase network topology carefully.
-  - Consider validation of the model using part of the **training** dataset.
-  - Adjust hyperparameters to increase your internal validation accuracy.
-  - DO NOT WAIT UNTIL THE WEEK BEFORE THE DEADLINE!
+```./evaluate.sh```
 
-### FAQ
-**Q:** Can I write in Python, please, please, pretty please?  
-**A:** No. It's too slow without matrix libraries.
- 
-**Q:** Can I implement a convolutional neural network instead of the 
-    feed-forward neural network?  
-**A:** Yes, but it might be harder.
-
-**Q:** Can I use attention?  
-**A:** Yes, but it might be much harder.
-
-Good luck with the project!
-
-Tomáš Foltýnek
-4374@mail.muni.cz
-PV021 Neural Networks
+Note on Server Deployment (AURA)
+If you need to deploy this project to the university AURA server, a script named ```upload_data_aura.sh``` is included to facilitate the transfer of data and source code.
