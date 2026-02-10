@@ -1,4 +1,4 @@
-# PV021 Project -- Deep Learning from Scratch in Java
+# Neural Networks Project -- Deep Learning from Scratch in Java
 
 ## Members
 - **Joan Bejarano Montero**
